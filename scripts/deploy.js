@@ -11,10 +11,10 @@ async function deploy() {
 
     const RomeProFactory = await ethers.getContractFactory("RomeProFactory");
     const romeProFactory = await RomeProFactory.deploy(
-        "", //Rome treasury address
+        "0xfbAD41e4Dd040BC80c89FcC6E90d152A746139aF", //Rome treasury address
         romeProFactoryStorage.address, 
         rpSubsidyRouter.address, 
-        "" //RomeDao adddress
+        "0xD4a7FEbD52efda82d6f8acE24908aE0aa5b4f956" //RomeDao adddress
     );
     await romeProFactory.deployed();
 
