@@ -9,7 +9,6 @@ async function deploy() {
     const rpSubsidyRouter = await RPSubsidyRouter.deploy();
     await rpSubsidyRouter.deployed()
 
-
     const RomeProFactory = await ethers.getContractFactory("RomeProFactory");
     const romeProFactory = await RomeProFactory.deploy(
         "", //Rome treasury address
