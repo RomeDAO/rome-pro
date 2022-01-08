@@ -57,7 +57,7 @@ async function deploy() {
 
     await romeProFactoryStorage.setFactoryAddress(romeProFactory.address)
 
-    const tierCeilings = [1000 * 10 ** 9, 2000 * 10 ** 9]
+    const tierCeilings = [BigInt(1000 * 10 ** 18), BigInt(2000 * 10 ** 18)]
     const fees = [0.033 * 10 ** 6, 0.066 * 10 ** 6]
     await romeProFactory.createBondAndTreasury(payoutToken.address, frax.address, mockDAO.address, tierCeilings, fees)
 }
