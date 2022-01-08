@@ -48,6 +48,18 @@ async function deploy() {
     await romeProFactory.deployed();
 
     console.log("RomeProFactory deployed to:", romeProFactory.address);
+
+    const PayoutToken = await ethers.getContractFactory("mockWMOVR")
+    const payoutToken = await PayoutToken.deploy()
+    await payoutToken.deployed()
+
+    console.log("PayoutToken deployed to: ", payoutToken.address)
+
+    await romeProFactoryStorage.setFactoryAddress(romeProFactory.address)
+
+    const tierCeilings = [1000 * 10 ** 9, 2000 * 10 ** 9]
+    const fees = [0.033 * 10 ** 6, 0.066 * 10 ** 6]
+    await romeProFactory.createBondAndTreasury(payoutToken.address, frax.address, mockDAO.address, tierCeilings, fees)
 }
 
 deploy()
