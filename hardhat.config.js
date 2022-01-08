@@ -1,8 +1,39 @@
 require("@nomiclabs/hardhat-waffle");
-import {node_url, accounts, getChainId} from './utils/network';
+const {node_url, accounts, getChainId, apiKey} = require('./utils/network.js')
+// import {node_url, accounts, getChainId} from ;
 
 module.exports = {
-  solidity: "0.7.5",
+  solidity: {
+    compilers: [
+      {
+        version:'0.7.5',
+        settings: {
+          optimizer: {
+            enabled: true,
+            runs: 9999,
+          }
+        }
+      },
+      {
+        version: '0.5.0',
+        settings: {
+          optimizer: {
+            enabled: true,
+            runs: 9999,
+          }
+        }
+      },
+      {
+        version:'0.5.16',
+        settings: {
+          optimizer: {
+            enabled: true,
+            runs: 9999,
+          }
+        }
+      },
+    ]
+  },
   networks: {
     localhost: {
       url: node_url('localhost'),

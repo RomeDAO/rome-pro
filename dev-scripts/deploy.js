@@ -4,9 +4,11 @@ async function deploy() {
     const [deployer, mockDAO] = await ethers.getSigners();
 
     // Deploy ROME
-    const ROME = await ethers.getContractFactory('RomeERC20Token');
-    const rome = await ROME.deploy();
+    const Rome = await ethers.getContractFactory('RomeERC20Token');
+    const rome = await Rome.deploy();
     await rome.deployed()
+
+    console.log("MockRome deployed to:", rome.address);
 
     // Deploy FRAX
     const Frax = await ethers.getContractFactory('FRAX');
@@ -15,18 +17,26 @@ async function deploy() {
 
     await frax.mint( deployer.address, '1000000000' );
 
+    console.log("MockFrax deployed to:", frax.address);
+
     // Deploy Treasury
     const Treasury = await ethers.getContractFactory('MockRomeTreasury'); 
     const treasury = await Treasury.deploy( rome.address, frax.address, 0 );
     await treasury.deployed()
 
+    console.log("MockRomeTreasury deployed to:", treasury.address);
+
     const RomeProFactoryStorage = await ethers.getContractFactory("RomeProFactoryStorage");
     const romeProFactoryStorage = await RomeProFactoryStorage.deploy();
     await romeProFactoryStorage.deployed()
 
+    console.log("RomeProFactoryStorage deployed to:", romeProFactoryStorage.address);
+
     const RPSubsidyRouter = await ethers.getContractFactory("RPSubsidyRouter");
     const rpSubsidyRouter = await RPSubsidyRouter.deploy();
     await rpSubsidyRouter.deployed()
+
+    console.log("RPSubsidyRouter deployed to:", rpSubsidyRouter.address);
 
     const RomeProFactory = await ethers.getContractFactory("RomeProFactory");
     const romeProFactory = await RomeProFactory.deploy(
