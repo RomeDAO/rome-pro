@@ -18,6 +18,8 @@ async function deploy() {
     );
     await romeProFactory.deployed();
 
+    await romeProFactoryStorage.setFactoryAddress(romeProFactory.address);
+
     console.log("RomeProFactory deployed to:", romeProFactory.address);
 }
 
