@@ -3,6 +3,13 @@ const { ethers } = require("hardhat");
 async function deploy() {
     const [deployer, mockDAO] = await ethers.getSigners();
 
+    // Deploy Generic Bonding Calculator
+    const GenericBondingCalculator = await ethers.getContractFactory('GenericBondingCalculator');
+    const genericBondingCalculator = await GenericBondingCalculator.deploy();
+    await genericBondingCalculator.deployed()
+
+    console.log("GenericBondingCalculator deployed to:", genericBondingCalculator.address);
+
     // Deploy ROME
     const Rome = await ethers.getContractFactory('RomeERC20Token');
     const rome = await Rome.deploy();
