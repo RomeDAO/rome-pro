@@ -66,10 +66,10 @@ async function deploy() {
 
     const tierCeilings = [BigInt(1000 * 10 ** 18), BigInt(2000 * 10 ** 18)]
     const fees = [0.033 * 10 ** 6, 0.066 * 10 ** 6]
-    const hey = await romeProFactory.createBondAndTreasury(payoutToken.address, frax.address, mockDAO.address, tierCeilings, fees)
+    const treasuryAndBond = await romeProFactory.createBondAndTreasury(payoutToken.address, frax.address, mockDAO.address, tierCeilings, fees)
     
-    console.log("A: ",mockDAO.address, deployer.address)
-    console.log("B: ",hey)
+    console.log("Treasury address: ", treasuryAndBond[0])
+    console.log("Bond address: ", treasuryAndBond[1])
 }
 
 deploy()
