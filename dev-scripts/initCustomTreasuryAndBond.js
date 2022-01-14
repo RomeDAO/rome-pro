@@ -18,24 +18,31 @@ async function deploy() {
 
     console.log("PrincipleFrax deployed to:", principleToken.address);
 
-    const factoryAddress = ""
+    const factoryAddress = "0xDC11f7E700A4c898AE5CAddB1082cFfa76512aDD"
+    const factoryStorageAddress = "0x2E2Ed0Cfd3AD2f1d34481277b3204d807Ca2F8c2"
     const payoutTokenAddress = payoutToken.address
-    const principleAddress = frax.address
-    const daoAddress = mockDAO
+    const principleAddress = principleToken.address
+    const daoAddress = mockDAO.address
+
+    const FactoryStorage = await ethers.getContractFactory("RomeProFactoryStorage");
+    const factoryStorage = await FactoryStorage.attach(factoryStorageAddress)
 
     const RomeProFactory = await ethers.getContractFactory("RomeProFactory");
     const romeProFactory = await RomeProFactory.attach(factoryAddress);
     
     const tierCeilings = [1]
     const fees = [0.033 * 10 ** 6]
-    const treasuryAndBond = await romeProFactory.createBondAndTreasury(payoutTokenAddress, principleAddress, daoAddress, tierCeilings, fees)
+    await romeProFactory.createBondAndTreasury(payoutTokenAddress, principleAddress, daoAddress, tierCeilings, fees)
     
-    console.log("Treasury address: ", treasuryAndBond[0])
-    console.log("Bond address: ", treasuryAndBond[1])
+    factoryStorage.on("BondCreation", (treasury, bond, initialOwner) => {
+        console.log("Custom treasury created at: ", treasury)
+        console.log("Custom bond created at: ", bond)
+        console.log("Initial owner: ", initialOwner)
+    });
 }
 
 deploy()
-.then(() => process.exit(0))
+.then(() => {})
 .catch((error) => {
     console.error(error);
     process.exit(1);
