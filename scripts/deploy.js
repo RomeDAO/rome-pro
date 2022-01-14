@@ -1,13 +1,25 @@
 const { ethers } = require("hardhat");
 
 async function deploy() {
+
+    // Deploy Generic Bonding Calculator
+    const GenericBondingCalculator = await ethers.getContractFactory('GenericBondingCalculator');
+    const genericBondingCalculator = await GenericBondingCalculator.deploy();
+    await genericBondingCalculator.deployed()
+
+    console.log("GenericBondingCalculator deployed to:", genericBondingCalculator.address);
+
     const RomeProFactoryStorage = await ethers.getContractFactory("RomeProFactoryStorage");
     const romeProFactoryStorage = await RomeProFactoryStorage.deploy();
     await romeProFactoryStorage.deployed()
 
+    console.log("RomeProFactoryStorage deployed to:", romeProFactoryStorage.address);
+
     const RPSubsidyRouter = await ethers.getContractFactory("RPSubsidyRouter");
     const rpSubsidyRouter = await RPSubsidyRouter.deploy();
     await rpSubsidyRouter.deployed()
+
+    console.log("RPSubsidyRouter deployed to:", rpSubsidyRouter.address);
 
     const RomeProFactory = await ethers.getContractFactory("RomeProFactory");
     const romeProFactory = await RomeProFactory.deploy(
