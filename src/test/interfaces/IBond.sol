@@ -16,4 +16,8 @@ interface IBond {
 
     enum PARAMETER { VESTING, PAYOUT, DEBT }
     function setBondTerms ( PARAMETER _parameter, uint _input ) external;
+    
+    function bondPrice() external view returns ( uint price_ );
+    
+    function trueBondPrice() external view returns ( uint price_ );
 }

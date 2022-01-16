@@ -17,6 +17,7 @@ import "@openzeppelin/contracts/math/SafeMath.sol";
 import {RomeProFactory, CustomBond, CustomTreasury} from "../factory.sol";
 import {RomeProFactoryStorage} from "../factoryStorage.sol";
 import {RPSubsidyRouter} from "../subsidy.sol";
+import {GenericBondingCalculator} from "../genericBondingCalculator.sol";
 
 /* ========== BOND CONTRACT ========== */
 contract BondUser {
@@ -75,6 +76,8 @@ contract BondTest is DSTest {
     RomeProFactoryStorage internal factoryStorage;
 
     RPSubsidyRouter internal subsidy;
+    
+    GenericBondingCalculator internal calculator;
 
     uint movrPrice;
 
@@ -82,7 +85,7 @@ contract BondTest is DSTest {
 
     address internal TREASURY;
 
-    uint numberUsers = 10;
+    uint numberUsers = 2;
 
     BondUser[] internal user;
 
@@ -95,10 +98,12 @@ contract BondTest is DSTest {
     emit log("|=====================================================|");
 
         
-        //1. Deploy Factory Storage and subsidy
+        //1. Deploy Factory Storage and subsidy and calculator
         factoryStorage = new RomeProFactoryStorage();
 
         subsidy = new RPSubsidyRouter();
+
+        calculator = new GenericBondingCalculator();
 
         //2. Deploy Factory
         factory = new RomeProFactory(
@@ -154,7 +159,7 @@ contract BondTest is DSTest {
             minPrice,
             maxPayout,
             5000000000000000,
-            1
+            0
         );
         vm.stopPrank();
 
@@ -163,36 +168,61 @@ contract BondTest is DSTest {
         uint tokenPrice = reserve1.mul(movrPrice).div(reserve0);
         emit log_named_uint("<|HND Price USD|> ==", tokenPrice.div(1e8));
 
+        //3. Users Bond
         for (uint i = 0; i < numberUsers; i++) {
             emit log_named_uint("deposit number",i+1);
-            emit log_named_uint("bond price ", BOND.bondPrice());
-            emit log_named_uint("bond price in USD", BOND.bondPriceInUSD().div(1e18));
+            uint _bondPrice = IBond(BOND).bondPrice();
+            emit log_named_uint("bond price", _bondPrice);
+            uint _trueBondPrice = IBond(BOND).trueBondPrice();
+            emit log_named_uint("true bond price", _trueBondPrice);
+            emit log_named_uint("true bond price in USD", bondPriceInUSD(_trueBondPrice).div(1e18));
             address addr = address(user[i]);
 
-            //4. mint Rome and Movr
-            setBalance(addr,50*1e18,address(WMOVR),3);
-            setBalance(addr,25*1e9,address(ROME),0);     
+            // // //4. mint token and Movr for LP
+            // setBalance(addr,50*1e18,address(WMOVR),3);
+            // setBalance(addr,50*1e18,address(PAYOUT),0);     
 
-            //5. add liquidity
-            uint balBefore = ROME.balanceOf(addr);
-            user[i].addLiquidity(address(ROUTER),address(ROME),address(WMOVR));
-            emit log_named_uint("LP added in ROME", 2*(balBefore.sub(ROME.balanceOf(addr))).div(1e9));
+            // //5. add liquidity
+            // uint balBefore = ROME.balanceOf(addr);
+            // user[i].addLiquidity(address(ROUTER),address(ROME),address(WMOVR));
+            // emit log_named_uint("LP added in ROME", 2*(balBefore.sub(ROME.balanceOf(addr))).div(1e9));
 
-            //6. purchase bonds
-            uint payout = user[i].deposit(ROMEMOVR.balanceOf(addr), 200000*1e11, addr);
+            // //6. purchase bonds
+            // uint payout = user[i].deposit(ROMEMOVR.balanceOf(addr), 200000*1e11, addr);
 
-            //7. Print Payout in USD
-            emit log_named_uint("Payout in ROME ==",payout.div(1e9));
+            // //7. Print Payout in USD
+            // emit log_named_uint("Payout in ROME ==",payout.div(1e9));
 
-            emit log("==============================");
+            // emit log("==============================");
 
 
         }
     }
 
-    // /* ========== HELPERS ========== */
+    /* ========== HELPERS ========== */
+
+    function bondPriceInUSD(uint256 bondPrice) public view returns ( uint price_ ) {
+       price_ = bondPrice
+                .mul( markdown( address(PRINCIPLE), address(WMOVR) )
+                .mul( uint( movrPrice ) ) // 8 decimals
+                .div( 1e12 ));
+    }
+
+    function markdown( address _pair, address _mainToken ) public view returns ( uint ) {
+        ( uint reserve0, uint reserve1, ) = IUniswapV2Pair( _pair ).getReserves();
+
+        uint reserve;
+        if ( IUniswapV2Pair( _pair ).token0() == _mainToken ) {
+            reserve = reserve1;
+        } else {
+            reserve = reserve0;
+        }
+        emit log_uint(reserve.mul(2));
+        return reserve.mul( 2 );
+    }
+
     // function setBalance(address account, uint256 amount, address token, uint256 slot) public {
-    //     hevm.store(
+    //     vm.store(
     //         token,
     //         keccak256(abi.encode(account, slot)),
     //         bytes32(amount)

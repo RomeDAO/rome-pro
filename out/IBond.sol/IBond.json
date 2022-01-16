@@ -2,6 +2,20 @@
   "abi": [
     {
       "type": "function",
+      "name": "bondPrice",
+      "inputs": [],
+      "outputs": [
+        {
+          "internalType": "uint256",
+          "name": "price_",
+          "type": "uint256"
+        }
+      ],
+      "constant": null,
+      "stateMutability": "view"
+    },
+    {
+      "type": "function",
       "name": "deposit",
       "inputs": [
         {
@@ -87,6 +101,20 @@
       "outputs": [],
       "constant": null,
       "stateMutability": "nonpayable"
+    },
+    {
+      "type": "function",
+      "name": "trueBondPrice",
+      "inputs": [],
+      "outputs": [
+        {
+          "internalType": "uint256",
+          "name": "price_",
+          "type": "uint256"
+        }
+      ],
+      "constant": null,
+      "stateMutability": "view"
     }
   ],
   "bin": "0x",
