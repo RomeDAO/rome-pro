@@ -149,20 +149,22 @@ contract BondTest is DSTest {
         emit log_named_uint("<|BCV|> == ", bcv);
         uint vestingTerm = 32000;
         emit log_named_uint("<|Vesting Term in blocks|>", vestingTerm);
-        uint minPrice = 41040;
+        uint minPrice = 44200;
         emit log_named_uint("<|Min Price|> ==", minPrice);
         uint maxPayout = 5;
         emit log_named_uint("<|Max Payout|> ==", maxPayout);
+        uint initialDebt = 0;
+        emit log_named_uint("<|Initial Debt|> ==", initialDebt);
 
         vm.startPrank(initialOwner);
         IBond(BOND).setBondTerms(IBond.PARAMETER(0),vestingTerm);
         IBond(BOND).initializeBond(
             bcv,
             vestingTerm,
-            53100,
+            minPrice,
             maxPayout,
             5000000000000000,
-            0
+            initialDebt
         );
         ITreasury(TREASURY).toggleBondContract(BOND);
         vm.stopPrank();
@@ -181,11 +183,11 @@ contract BondTest is DSTest {
         for (uint i = 0; i < numberUsers; i++) {
             emit log_named_uint("deposit number",i+1);
             uint _bondPrice = IBond(BOND).bondPrice();
-            emit log_named_uint("bond price", _bondPrice);
+            emit log_named_uint("bond price (4)", _bondPrice);
 
             uint _trueBondPrice = IBond(BOND).trueBondPrice();
-            emit log_named_uint("true bond price", _trueBondPrice);
-            emit log_named_uint("true bond price in USD", bondPriceInUSD(_trueBondPrice));
+            emit log_named_uint("true bond price (4)", _trueBondPrice);
+            emit log_named_uint("true bond price in USD (6)", bondPriceInUSD(_trueBondPrice));
             address addr = address(user[i]);
 
             // //4. mint token and Movr for LP
@@ -194,20 +196,16 @@ contract BondTest is DSTest {
 
             //5. add liquidity
             uint balBefore = PAYOUT.balanceOf(addr);
-            emit log_named_uint("LP Balance", PRINCIPLE.balanceOf(addr));
             user[i].addLiquidity(address(ROUTER),address(PAYOUT),address(WMOVR));
-            emit log_named_uint("Payout Balance After adding liquidity", PAYOUT.balanceOf(addr));
-            emit log_named_uint("LP added in PAYOUT (2) ==", 2*(balBefore.sub(PAYOUT.balanceOf(addr))).div(1e16));
-            emit log_named_uint("LP Balance", PRINCIPLE.balanceOf(addr));
-
-            emit log_named_uint("Payout Balance Before (2) ==", PAYOUT.balanceOf(BOND));
+            uint deposited = 2*(balBefore.sub(PAYOUT.balanceOf(addr)));
+            emit log_named_uint("LP added in PAYOUT (2) ==", deposited.div(1e16));
 
             //6. purchase bonds
             uint payout = user[i].deposit(address(BOND),PRINCIPLE.balanceOf(addr), 200000*1e11, addr);
 
             // //7. Print Payout in USD
-            emit log_named_uint("Payout in HND (2) ==",payout);
-            emit log_named_uint("Payout Balance (2) ==", PAYOUT.balanceOf(BOND));
+            emit log_named_uint("Payout in HND (2) ==",payout.div(1e16));
+            emit log_named_uint("Discount ==", deposited.mul(1e4).div(payout));
             emit log("==============================");
 
 
