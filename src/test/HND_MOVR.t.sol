@@ -187,7 +187,7 @@ contract BondTest is DSTest {
 
             uint _trueBondPrice = IBond(BOND).trueBondPrice();
             emit log_named_uint("true bond price (4)", _trueBondPrice);
-            emit log_named_uint("true bond price in USD (6)", bondPriceInUSD(_trueBondPrice));
+            emit log_named_uint("true bond price in USD (2)", bondPriceInUSD(_trueBondPrice).div(1e4));
             address addr = address(user[i]);
 
             // //4. mint token and Movr for LP
@@ -207,6 +207,9 @@ contract BondTest is DSTest {
             emit log_named_uint("Payout in HND (2) ==",payout.div(1e16));
             emit log_named_uint("Discount ==", deposited.mul(1e4).div(payout));
             emit log("==============================");
+
+            emit log_uint(deposited);
+            emit log_uint(payout);
 
 
         }
