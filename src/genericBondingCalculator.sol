@@ -105,10 +105,9 @@ interface AggregatorV3Interface {
 }
 
 contract GenericBondingCalculator {
+    using SafeMath for uint256;
 
-    using SafeMath for uint;
-
-    function valuation( address _pair, address _reserve ) external view returns ( uint ) {
+    function valuation( address _pair, address _reserve ) public view returns ( uint ) {
         ( uint reserve0, uint reserve1, ) = IUniswapV2Pair( _pair ).getReserves();
 
         uint reserve;
@@ -118,27 +117,16 @@ contract GenericBondingCalculator {
             reserve = reserve1;
         }
         return reserve
-                .mul( 2 * IERC20( _pair ).decimals() )
-                .div( IUniswapV2Pair( _pair ).totalSupply() * IERC20( _reserve ).decimals());
+                .mul( 2 * ( 10 ** IERC20( _pair ).decimals() ))
+                .mul( 1e6 )
+                .div( IUniswapV2Pair( _pair ).totalSupply() * ( 10 ** IERC20( _reserve ).decimals() ));
     }
 
     function valuationInUSD( address _pair, address _reserve, address _feed ) external view returns ( uint ) {
-        ( uint reserve0, uint reserve1, ) = IUniswapV2Pair( _pair ).getReserves();
-
-        uint reserve;
-        if ( IUniswapV2Pair( _pair ).token0() == _reserve ) {
-            reserve = reserve0;
-        } else {
-            reserve = reserve1;
-        }
-        return reserve
-                .mul( 2 * IERC20( _pair ).decimals() )
-                .mul( assetPrice( _feed ) )
-                .div( IUniswapV2Pair( _pair ).totalSupply() * IERC20( _reserve ).decimals()
-                .div( AggregatorV3Interface( _feed).decimals() );
+        return valuation( _pair, _reserve ).mul( uint256(assetPrice( _feed )).div(1e8));
     }
 
-    function assetPrice(address _priceFeed) internal view returns (int) {
+    function assetPrice(address _priceFeed) public view returns (int) {
         ( , int price, , , ) = AggregatorV3Interface( _priceFeed ).latestRoundData();
         return price;
     }

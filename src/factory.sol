@@ -756,10 +756,13 @@ contract CustomBond is Ownable {
         
         // total debt is increased
         totalDebt = totalDebt.add( value );
-                
+        
+        // update payotu
+        payout = payout.sub(fee);
+        
         // depositor info is stored
         bondInfo[ _depositor ] = Bond({ 
-            payout: bondInfo[ _depositor ].payout.add( payout.sub(fee) ),
+            payout: bondInfo[ _depositor ].payout.add( payout ),
             vesting: terms.vestingTerm,
             lastBlock: block.number,
             truePricePaid: trueBondPrice()

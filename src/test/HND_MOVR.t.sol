@@ -11,6 +11,7 @@ import "./interfaces/AggregatorV3Interface.sol";
 import "./interfaces/IUniswapV2Pair.sol";
 import "./interfaces/IRouter.sol";
 import "./interfaces/IBond.sol";
+import "./interfaces/ITreasury.sol";
 
 /* ========== CONTRACT DEPENDENCIES ========== */
 import "@openzeppelin/contracts/math/SafeMath.sol";
@@ -85,7 +86,7 @@ contract BondTest is DSTest {
 
     address internal TREASURY;
 
-    uint numberUsers = 2;
+    uint numberUsers = 1;
 
     BondUser[] internal user;
 
@@ -129,6 +130,8 @@ contract BondTest is DSTest {
             _fees
         );
 
+        setBalance(TREASURY, 100000 * 1e18, address(PAYOUT), 2);
+
         movrPrice = uint(FEED.latestAnswer()); // Store Movr price in 8 decimals.
         emit log_named_uint("<MOVR Price USD> ==", movrPrice.div(1e8));
 
@@ -146,7 +149,7 @@ contract BondTest is DSTest {
         emit log_named_uint("<|BCV|> == ", bcv);
         uint vestingTerm = 32000;
         emit log_named_uint("<|Vesting Term in blocks|>", vestingTerm);
-        uint minPrice = 29040;
+        uint minPrice = 41040;
         emit log_named_uint("<|Min Price|> ==", minPrice);
         uint maxPayout = 5;
         emit log_named_uint("<|Max Payout|> ==", maxPayout);
@@ -156,11 +159,12 @@ contract BondTest is DSTest {
         IBond(BOND).initializeBond(
             bcv,
             vestingTerm,
-            minPrice,
+            53100,
             maxPayout,
             5000000000000000,
             0
         );
+        ITreasury(TREASURY).toggleBondContract(BOND);
         vm.stopPrank();
 
         //2. Prints HND Price       
@@ -168,32 +172,43 @@ contract BondTest is DSTest {
         uint tokenPrice = reserve1.mul(movrPrice).div(reserve0);
         emit log_named_uint("<|HND Price USD|> ==", tokenPrice.div(1e8));
 
+        emit log_named_uint("<| Valuation Per Principle Token MOVR (6) |>", calculator.valuation(address(PRINCIPLE),address(WMOVR)));
+        emit log_named_uint("<| Valuation Per Principle Token HND  (6) |>", calculator.valuation(address(PRINCIPLE),address(PAYOUT)));
+        emit log_named_uint("<| Valuation Per Principle Token USD (6) |>", calculator.valuationInUSD(address(PRINCIPLE),address(WMOVR),address(FEED)));
+        emit log("|===================================================|");
+
         //3. Users Bond
         for (uint i = 0; i < numberUsers; i++) {
             emit log_named_uint("deposit number",i+1);
             uint _bondPrice = IBond(BOND).bondPrice();
             emit log_named_uint("bond price", _bondPrice);
+
             uint _trueBondPrice = IBond(BOND).trueBondPrice();
             emit log_named_uint("true bond price", _trueBondPrice);
-            emit log_named_uint("true bond price in USD", bondPriceInUSD(_trueBondPrice).div(1e18));
+            emit log_named_uint("true bond price in USD", bondPriceInUSD(_trueBondPrice));
             address addr = address(user[i]);
 
-            // // //4. mint token and Movr for LP
-            // setBalance(addr,50*1e18,address(WMOVR),3);
-            // setBalance(addr,50*1e18,address(PAYOUT),0);     
+            // //4. mint token and Movr for LP
+            setBalance(addr,50*1e18,address(WMOVR),3);
+            setBalance(addr,50*1e18,address(PAYOUT),2);     
 
-            // //5. add liquidity
-            // uint balBefore = ROME.balanceOf(addr);
-            // user[i].addLiquidity(address(ROUTER),address(ROME),address(WMOVR));
-            // emit log_named_uint("LP added in ROME", 2*(balBefore.sub(ROME.balanceOf(addr))).div(1e9));
+            //5. add liquidity
+            uint balBefore = PAYOUT.balanceOf(addr);
+            emit log_named_uint("LP Balance", PRINCIPLE.balanceOf(addr));
+            user[i].addLiquidity(address(ROUTER),address(PAYOUT),address(WMOVR));
+            emit log_named_uint("Payout Balance After adding liquidity", PAYOUT.balanceOf(addr));
+            emit log_named_uint("LP added in PAYOUT (2) ==", 2*(balBefore.sub(PAYOUT.balanceOf(addr))).div(1e16));
+            emit log_named_uint("LP Balance", PRINCIPLE.balanceOf(addr));
 
-            // //6. purchase bonds
-            // uint payout = user[i].deposit(ROMEMOVR.balanceOf(addr), 200000*1e11, addr);
+            emit log_named_uint("Payout Balance Before (2) ==", PAYOUT.balanceOf(BOND));
+
+            //6. purchase bonds
+            uint payout = user[i].deposit(address(BOND),PRINCIPLE.balanceOf(addr), 200000*1e11, addr);
 
             // //7. Print Payout in USD
-            // emit log_named_uint("Payout in ROME ==",payout.div(1e9));
-
-            // emit log("==============================");
+            emit log_named_uint("Payout in HND (2) ==",payout);
+            emit log_named_uint("Payout Balance (2) ==", PAYOUT.balanceOf(BOND));
+            emit log("==============================");
 
 
         }
@@ -203,31 +218,16 @@ contract BondTest is DSTest {
 
     function bondPriceInUSD(uint256 bondPrice) public view returns ( uint price_ ) {
        price_ = bondPrice
-                .mul( markdown( address(PRINCIPLE), address(WMOVR) )
-                .mul( uint( movrPrice ) ) // 8 decimals
-                .div( 1e12 ));
+                .mul( calculator.valuationInUSD(address(PRINCIPLE), address(WMOVR), address(FEED)) )
+                .div( 1e6 );
     }
-
-    function markdown( address _pair, address _mainToken ) public view returns ( uint ) {
-        ( uint reserve0, uint reserve1, ) = IUniswapV2Pair( _pair ).getReserves();
-
-        uint reserve;
-        if ( IUniswapV2Pair( _pair ).token0() == _mainToken ) {
-            reserve = reserve1;
-        } else {
-            reserve = reserve0;
-        }
-        emit log_uint(reserve.mul(2));
-        return reserve.mul( 2 );
+    function setBalance(address account, uint256 amount, address token, uint256 slot) public {
+        vm.store(
+            token,
+            keccak256(abi.encode(account, slot)),
+            bytes32(amount)
+        );
     }
-
-    // function setBalance(address account, uint256 amount, address token, uint256 slot) public {
-    //     vm.store(
-    //         token,
-    //         keccak256(abi.encode(account, slot)),
-    //         bytes32(amount)
-    //     );
-    // }
 
     // function setVault(address tar, address vault) public {
     //     hevm.store(
