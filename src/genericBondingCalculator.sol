@@ -118,7 +118,7 @@ contract GenericBondingCalculator {
         }
         return reserve
                 .mul( 2 * ( 10 ** IERC20( _pair ).decimals() ))
-                .mul( 1e6 )
+                .mul( 1e18 )
                 .div( IUniswapV2Pair( _pair ).totalSupply() * ( 10 ** IERC20( _reserve ).decimals() ));
     }
 

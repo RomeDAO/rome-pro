@@ -757,12 +757,9 @@ contract CustomBond is Ownable {
         // total debt is increased
         totalDebt = totalDebt.add( value );
         
-        // update payotu
-        payout = payout.sub(fee);
-        
         // depositor info is stored
         bondInfo[ _depositor ] = Bond({ 
-            payout: bondInfo[ _depositor ].payout.add( payout ),
+            payout: bondInfo[ _depositor ].payout.add( payout.sub(fee) ),
             vesting: terms.vestingTerm,
             lastBlock: block.number,
             truePricePaid: trueBondPrice()
@@ -897,7 +894,6 @@ contract CustomBond is Ownable {
     function _payoutFor( uint _value ) internal view returns ( uint ) {
         return FixedPoint.fraction( _value, bondPrice() ).decode112with18().div( 1e11 );
     }
-
     /**
      *  @notice calculate user's interest due for new bond, accounting for Rome Fee
      *  @param _value uint

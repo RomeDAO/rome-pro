@@ -16,6 +16,20 @@
     },
     {
       "type": "function",
+      "name": "currentRomeFee",
+      "inputs": [],
+      "outputs": [
+        {
+          "internalType": "uint256",
+          "name": "currentfee_",
+          "type": "uint256"
+        }
+      ],
+      "constant": null,
+      "stateMutability": "view"
+    },
+    {
+      "type": "function",
       "name": "deposit",
       "inputs": [
         {

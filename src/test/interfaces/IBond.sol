@@ -18,6 +18,8 @@ interface IBond {
     function setBondTerms ( PARAMETER _parameter, uint _input ) external;
     
     function bondPrice() external view returns ( uint price_ );
-    
+
     function trueBondPrice() external view returns ( uint price_ );
+
+    function currentRomeFee() external view returns ( uint currentfee_ );
 }
