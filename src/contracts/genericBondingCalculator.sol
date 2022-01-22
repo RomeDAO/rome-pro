@@ -107,6 +107,7 @@ interface AggregatorV3Interface {
 contract GenericBondingCalculator {
     using SafeMath for uint256;
 
+    // @notice it returns valuation per LP token in _reserve tokens (18 decimals)
     function valuation( address _pair, address _reserve ) public view returns ( uint ) {
         ( uint reserve0, uint reserve1, ) = IUniswapV2Pair( _pair ).getReserves();
 

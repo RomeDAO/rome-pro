@@ -1,5 +1,5 @@
-require('dotenv/config');
-function node_url(networkName) {
+import 'dotenv/config';
+export function node_url(networkName: string): string {
   if (networkName) {
     const uri = process.env['ETH_NODE_URI_' + networkName.toUpperCase()];
     if (uri && uri !== '') {
@@ -9,7 +9,7 @@ function node_url(networkName) {
 
   if (networkName === 'localhost') {
     // do not use ETH_NODE_URI
-    return 'http://127.0.0.1:8545';
+    return 'http://localhost:8545';
   }
 
   let uri = process.env.ETH_NODE_URI;
@@ -26,7 +26,7 @@ function node_url(networkName) {
   return uri;
 }
 
-function getMnemonic(networkName) {
+export function getMnemonic(networkName?: string): string {
   if (networkName) {
     const mnemonic = process.env['MNEMONIC_' + networkName.toUpperCase()];
     if (mnemonic && mnemonic !== '') {
@@ -41,11 +41,11 @@ function getMnemonic(networkName) {
   return mnemonic;
 }
 
-function accounts(networkName) {
+export function accounts(networkName?: string): {mnemonic: string} {
   return {mnemonic: getMnemonic(networkName)};
 }
 
-function getChainId(networkName) {
+export function getChainId(networkName?: string): number | undefined {
   if (networkName) {
     const chainId = process.env['CHAINID_' + networkName.toUpperCase()];
     if (chainId && chainId !== null) {
@@ -54,7 +54,7 @@ function getChainId(networkName) {
   }
 }
 
-function apiKey(networkName) {
+export function apiKey(networkName?: string): string | undefined {
   if (networkName) {
     const api = process.env['API_KEY_' + networkName.toUpperCase()];
     if (api && api !== '') {
@@ -64,8 +64,4 @@ function apiKey(networkName) {
       return '';
     }
   }
-}
-
-module.exports = {
-  node_url, getMnemonic, accounts, getChainId, apiKey
 }

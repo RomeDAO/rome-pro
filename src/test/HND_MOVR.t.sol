@@ -15,10 +15,10 @@ import "./interfaces/ITreasury.sol";
 
 /* ========== CONTRACT DEPENDENCIES ========== */
 import "@openzeppelin/contracts/math/SafeMath.sol";
-import {RomeProFactory, CustomBond, CustomTreasury} from "../factory.sol";
-import {RomeProFactoryStorage} from "../factoryStorage.sol";
-import {RPSubsidyRouter} from "../subsidy.sol";
-import {GenericBondingCalculator} from "../genericBondingCalculator.sol";
+import {RomeProFactory, CustomBond, CustomTreasury} from "../contracts/factory.sol";
+import {RomeProFactoryStorage} from "../contracts/factoryStorage.sol";
+import {RPSubsidyRouter} from "../contracts/subsidy.sol";
+import {GenericBondingCalculator} from "../contracts/genericBondingCalculator.sol";
 
 /* ========== BOND CONTRACT ========== */
 contract BondUser {
@@ -63,7 +63,7 @@ contract BondTest is DSTest {
 
     IRouter internal ROUTER = IRouter(0xAA30eF758139ae4a7f798112902Bf6d65612045f);
 
-    address internal initialOwner = (0x10010078a54396F62c96dF8532dc2B4847d47ED3); // HND Multisig
+    address internal initialOwner = (0xBf3bD01bd5fB28d2381d41A8eF779E6aa6f0a811); // HND Multisig
 
     /* ========== MOVR DEPENDENCIES ========== */
     IERC20 internal WMOVR = IERC20(0x98878B06940aE243284CA214f92Bb71a2b032B8A);
@@ -86,7 +86,7 @@ contract BondTest is DSTest {
 
     address internal TREASURY;
 
-    uint numberUsers = 1;
+    uint numberUsers = 5;
 
     BondUser[] internal user;
 
@@ -117,9 +117,9 @@ contract BondTest is DSTest {
         factoryStorage.setFactoryAddress(address(factory));
 
         uint[] memory _tierCeilings = new uint[](1);
-        _tierCeilings[0] = 10*1e18;
+        _tierCeilings[0] = 1000000*1e18;
         uint[] memory _fees = new uint[](1);
-        _fees[0] = 0; //change to 33300
+        _fees[0] = 33300; //change to 33,300/1,000,000
 
         //3. CreateBond and Treasury
         (TREASURY, BOND) = factory.createBondAndTreasury(
@@ -149,11 +149,11 @@ contract BondTest is DSTest {
         emit log_named_uint("<|BCV|> == ", bcv);
         uint vestingTerm = 32000;
         emit log_named_uint("<|Vesting Term in blocks|>", vestingTerm);
-        uint minPrice = 830000;
+        uint minPrice = 1;
         emit log_named_uint("<|Min Price|> ==", minPrice);
         uint maxPayout = 5;
         emit log_named_uint("<|Max Payout|> ==", maxPayout);
-        uint initialDebt = 0;
+        uint initialDebt = 123106712146927000000000;
         emit log_named_uint("<|Initial Debt|> ==", initialDebt);
 
         vm.startPrank(initialOwner);
@@ -163,7 +163,7 @@ contract BondTest is DSTest {
             vestingTerm,
             minPrice,
             maxPayout,
-            5000000000000000,
+            100000000000000000000000000,
             initialDebt
         );
         ITreasury(TREASURY).toggleBondContract(BOND);
@@ -198,15 +198,16 @@ contract BondTest is DSTest {
             uint balBefore = PAYOUT.balanceOf(addr);
             user[i].addLiquidity(address(ROUTER),address(PAYOUT),address(WMOVR));
             uint deposited = 2*(balBefore.sub(PAYOUT.balanceOf(addr)));
-            emit log_named_uint("LP added in PAYOUT (2) ==", deposited.div(1e16));
+            emit log_named_uint("LP added in PAYOUT (4) ==", deposited.div(1e14));
 
             //6. purchase bonds
             uint payout = user[i].deposit(address(BOND),PRINCIPLE.balanceOf(addr), 200000*1e11, addr);
+            emit log_named_uint("Payout in HND (4) ==",payout.div(1e14));
 
             // //7. Print Payout in USD
             uint fee = payout.mul( IBond(BOND).currentRomeFee() ).div( 1e6 );
             payout = payout.sub(fee);
-            emit log_named_uint("Payout in HND (2) ==",payout.div(1e16));
+            emit log_named_uint("True Payout in HND (4) ==",payout.div(1e14));
             emit log("==============================");
 
         }
