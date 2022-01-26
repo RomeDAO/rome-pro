@@ -54,7 +54,7 @@ contract BondUser {
 }
 
 /* ========== GENERIC BOND TESTER ========== */
-contract BondTester is DSTest, Constants {
+contract BondTester is DSTest {
     using SafeMath for uint;
 
     Vm internal constant vm = Vm(HEVM_ADDRESS);

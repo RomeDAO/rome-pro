@@ -12,6 +12,7 @@ import "./interfaces/ITreasury.sol";
 /* ========== CONTRACT DEPENDENCIES ========== */
 import "@openzeppelin/contracts/math/SafeMath.sol";
 import {BondUser, BondTester} from "./BOND_TESTER.t.sol";
+import "./utils/Constants.sol";
 
 
 contract HndMovrTest is BondTester {
@@ -22,10 +23,10 @@ contract HndMovrTest is BondTester {
         super.setUpFactory();
 
         /* ========== USER INPUTS ========= */
-        PAYOUT = IERC20(HND_MOVR_PAYOUT); // HND token
-        PRINCIPLE = IUniswapV2Pair(HND_MOVR_PRINCIPLE); // HND/MOVR liquidity
-        ROUTER = IRouter(HND_MOVR_ROUTER);
-        initialOwner = (HND_MULTISIG); // HND Multisig
+        PAYOUT = IERC20(Constants.HND_MOVR_PAYOUT); // HND token
+        PRINCIPLE = IUniswapV2Pair(Constants.HND_MOVR_PRINCIPLE); // HND/MOVR liquidity
+        ROUTER = IRouter(Constants.HND_MOVR_ROUTER);
+        initialOwner = (Constants.HND_MULTISIG); // HND Multisig
 
         emit log("|==================== USER INPUTS ====================|");
         emit log_named_address("Payout Token =", address(PAYOUT));

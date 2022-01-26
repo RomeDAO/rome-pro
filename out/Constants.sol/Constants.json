@@ -1,0 +1,76 @@
+{
+  "abi": [
+    {
+      "type": "function",
+      "name": "HND_MOVR_PAYOUT",
+      "inputs": [],
+      "outputs": [
+        {
+          "internalType": "address",
+          "name": "",
+          "type": "address"
+        }
+      ],
+      "constant": null,
+      "stateMutability": "view"
+    },
+    {
+      "type": "function",
+      "name": "HND_MOVR_PRINCIPLE",
+      "inputs": [],
+      "outputs": [
+        {
+          "internalType": "address",
+          "name": "",
+          "type": "address"
+        }
+      ],
+      "constant": null,
+      "stateMutability": "view"
+    },
+    {
+      "type": "function",
+      "name": "HND_MOVR_ROUTER",
+      "inputs": [],
+      "outputs": [
+        {
+          "internalType": "address",
+          "name": "",
+          "type": "address"
+        }
+      ],
+      "constant": null,
+      "stateMutability": "view"
+    },
+    {
+      "type": "function",
+      "name": "HND_MULTISIG",
+      "inputs": [],
+      "outputs": [
+        {
+          "internalType": "address",
+          "name": "",
+          "type": "address"
+        }
+      ],
+      "constant": null,
+      "stateMutability": "view"
+    },
+    {
+      "type": "function",
+      "name": "VM_ADDRESS",
+      "inputs": [],
+      "outputs": [
+        {
+          "internalType": "address",
+          "name": "",
+          "type": "address"
+        }
+      ],
+      "constant": null,
+      "stateMutability": "view"
+    }
+  ],
+  "bin": "0x610158610026600b82828239805160001a60731461001957fe5b30600052607381538281f3fe73000000000000000000000000000000000000000030146080604052600436106100615760003560e01c80632b41e1a01461006657806331dc2ec11461008a5780633d49149014610092578063736c414e1461009a578063a9a1c6f4146100a2575b600080fd5b61006e6100aa565b604080516001600160a01b039092168252519081900360200190f35b61006e6100c2565b61006e6100da565b61006e6100f2565b61006e61010a565b73aa30ef758139ae4a7f798112902bf6d65612045f81565b73bf3bd01bd5fb28d2381d41a8ef779e6aa6f0a81181565b73df1d4c921fe6a04ef086b4191e8742ecfbdaa35581565b7310010078a54396f62c96df8532dc2b4847d47ed381565b737109709ecfa91a80626ff3989d68f67f5b1dd12d8156fea2646970667358221220106f15de0403d9a8bdad60bdc56ce9df6c4fa977d5bc475ee85147900590669364736f6c63430007050033",
+  "bin-runtime": "0x73000000000000000000000000000000000000000030146080604052600436106100615760003560e01c80632b41e1a01461006657806331dc2ec11461008a5780633d49149014610092578063736c414e1461009a578063a9a1c6f4146100a2575b600080fd5b61006e6100aa565b604080516001600160a01b039092168252519081900360200190f35b61006e6100c2565b61006e6100da565b61006e6100f2565b61006e61010a565b73aa30ef758139ae4a7f798112902bf6d65612045f81565b73bf3bd01bd5fb28d2381d41a8ef779e6aa6f0a81181565b73df1d4c921fe6a04ef086b4191e8742ecfbdaa35581565b7310010078a54396f62c96df8532dc2b4847d47ed381565b737109709ecfa91a80626ff3989d68f67f5b1dd12d8156fea2646970667358221220106f15de0403d9a8bdad60bdc56ce9df6c4fa977d5bc475ee85147900590669364736f6c63430007050033"
+}
