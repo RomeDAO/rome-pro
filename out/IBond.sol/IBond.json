@@ -118,6 +118,20 @@
     },
     {
       "type": "function",
+      "name": "totalDebt",
+      "inputs": [],
+      "outputs": [
+        {
+          "internalType": "uint256",
+          "name": "",
+          "type": "uint256"
+        }
+      ],
+      "constant": null,
+      "stateMutability": "view"
+    },
+    {
+      "type": "function",
       "name": "trueBondPrice",
       "inputs": [],
       "outputs": [

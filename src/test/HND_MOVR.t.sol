@@ -65,6 +65,8 @@ contract BondTest is DSTest {
 
     address internal initialOwner = (0xBf3bD01bd5fB28d2381d41A8eF779E6aa6f0a811); // HND Multisig
 
+    IBond internal customBond = IBond(0x88D4768e986dC1FCda7C6e7E5E70f4457efd1fE9);
+
     /* ========== MOVR DEPENDENCIES ========== */
     IERC20 internal WMOVR = IERC20(0x98878B06940aE243284CA214f92Bb71a2b032B8A);
 
@@ -86,7 +88,7 @@ contract BondTest is DSTest {
 
     address internal TREASURY;
 
-    uint numberUsers = 5;
+    uint numberUsers = 10;
 
     BondUser[] internal user;
 
@@ -145,15 +147,16 @@ contract BondTest is DSTest {
     function testDeployment() public {
         //1. set terms
         emit log("|==================== BOND TERMS ====================|");
-        uint bcv = 6000;
+        uint bcv = 10000;
         emit log_named_uint("<|BCV|> == ", bcv);
         uint vestingTerm = 32000;
         emit log_named_uint("<|Vesting Term in blocks|>", vestingTerm);
-        uint minPrice = 1;
+        uint minPrice = 715475;
         emit log_named_uint("<|Min Price|> ==", minPrice);
         uint maxPayout = 5;
         emit log_named_uint("<|Max Payout|> ==", maxPayout);
-        uint initialDebt = 123106712146927000000000;
+        uint initialDebt = 0;
+        // uint initialDebt = IBond(customBond).totalDebt();
         emit log_named_uint("<|Initial Debt|> ==", initialDebt);
 
         vm.startPrank(initialOwner);
@@ -172,27 +175,31 @@ contract BondTest is DSTest {
         //2. Prints HND Price       
         (uint reserve0, uint reserve1,) = PRINCIPLE.getReserves();
         uint tokenPrice = reserve1.mul(movrPrice).div(reserve0);
-        emit log_named_uint("<|HND Price USD (2)|> ==", tokenPrice.div(1e6));
+        emit log_named_uint("<|HND Price USD (4)|> ==", tokenPrice.div(1e4));
+
+        emit log_named_uint("<|bondPrice at 0 discount|>", tokenPrice.mul(1e17).div(calculator.valuationInUSD(address(PRINCIPLE),address(WMOVR),address(FEED))));
 
         emit log_named_uint("<| Valuation Per Principle Token MOVR (6) |>", calculator.valuation(address(PRINCIPLE),address(WMOVR)).div(1e12));
-        emit log_named_uint("<| Valuation Per Principle Token HND  (6) |>", calculator.valuation(address(PRINCIPLE),address(PAYOUT)).div(1e12));
+        emit log_named_uint("<| Valuation Per Principle Token HND (alpha) (6) |>", calculator.valuation(address(PRINCIPLE),address(PAYOUT)).div(1e12));
         emit log_named_uint("<| Valuation Per Principle Token USD (6) |>", calculator.valuationInUSD(address(PRINCIPLE),address(WMOVR),address(FEED)).div(1e12));
         emit log("|===================================================|");
 
         //3. Users Bond
+        uint totalBonded;
         for (uint i = 0; i < numberUsers; i++) {
             emit log_named_uint("deposit number",i+1);
+            emit log_named_uint("tot debt (2)", IBond(BOND).totalDebt().div(1e16));
             uint _bondPrice = IBond(BOND).bondPrice();
             emit log_named_uint("bond price (7)", _bondPrice);
 
             uint _trueBondPrice = IBond(BOND).trueBondPrice();
             emit log_named_uint("true bond price (7)", _trueBondPrice);
-            emit log_named_uint("true bond price in USD (2)", bondPriceInUSD(_trueBondPrice).div(1e16));
+            emit log_named_uint("true bond price in USD (4)", bondPriceInUSD(_trueBondPrice).div(1e14));
             address addr = address(user[i]);
 
             // //4. mint token and Movr for LP
-            setBalance(addr,10*1e18,address(WMOVR),3);
-            setBalance(addr,10*1e18,address(PAYOUT),2);     
+            setBalance(addr,1000*1e18,address(WMOVR),3);
+            setBalance(addr,1000*1e18,address(PAYOUT),2);     
 
             //5. add liquidity
             uint balBefore = PAYOUT.balanceOf(addr);
@@ -208,8 +215,8 @@ contract BondTest is DSTest {
             uint fee = payout.mul( IBond(BOND).currentRomeFee() ).div( 1e6 );
             payout = payout.sub(fee);
             emit log_named_uint("True Payout in HND (4) ==",payout.div(1e14));
-            emit log("==============================");
-
+            totalBonded = totalBonded.add(payout);
+            emit log_named_uint("==============================Total Bonded (2)", totalBonded.div(1e16));
         }
     }
 

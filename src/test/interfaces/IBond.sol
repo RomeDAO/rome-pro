@@ -3,6 +3,8 @@ pragma solidity 0.7.5;
 
 interface IBond {
 
+    function totalDebt() external view returns (uint);
+
     function deposit(uint _amount, uint _maxPrice, address _depositor) external returns (uint);
 
     function initializeBond( 
