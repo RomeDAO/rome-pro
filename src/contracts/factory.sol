@@ -714,7 +714,7 @@ contract CustomBond is Ownable {
     }
     
     /* ======== USER FUNCTIONS ======== */
-    event log_named_uint(string key, uint val);
+    
     /**
      *  @notice deposit bond
      *  @param _amount uint
@@ -727,10 +727,6 @@ contract CustomBond is Ownable {
 
         decayDebt();
         require( totalDebt <= terms.maxDebt, "Max capacity reached" );
-        emit log_named_uint("Internal Current Debt", currentDebt() );
-        emit log_named_uint("Internal Debt Ratio", debtRatio() );
-        emit log_named_uint("Internal BCV x Debt Ratio", terms.controlVariable.mul( debtRatio() ));
-        emit log_named_uint("Internal bondPrice", terms.controlVariable.mul( debtRatio() ).div( 10 ** (uint256(payoutToken.decimals()).sub(5)) ));
         
         uint nativePrice = trueBondPrice();
 
